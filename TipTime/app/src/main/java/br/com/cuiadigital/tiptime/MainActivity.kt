@@ -2,10 +2,36 @@ package br.com.cuiadigital.tiptime
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import br.com.cuiadigital.tiptime.databinding.ActivityMainBinding
+import java.text.NumberFormat
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.calculateButton.setOnClickListener { calculateTip()  }
+    }
+
+    private fun calculateTip() {
+        val stringInTextField = binding.costOfService.text.toString()
+        val cost = stringInTextField.toDouble()
+        val selectedId = binding.tipOptions.checkedRadioButtonId
+        val tipPercentage = when(selectedId){
+            R.id.option_twenty_percent ->0.2
+            R.id.option_eighteen_percent -> 0.18
+            else -> 0.15
+        }
+        var tip = cost * tipPercentage
+        val tipRounded = binding.roundUpSwitch.isChecked
+        if (tipRounded){
+            tip = kotlin.math.ceil(tip)
+        }
+        val formattedTip = NumberFormat.getCurrencyInstance().format(tip)
+        binding.displayTip.text = getString(R.string.tip_amount, formattedTip)
     }
 }
